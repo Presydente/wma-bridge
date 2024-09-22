@@ -43,28 +43,27 @@ const my = {
   },
 
 getAuthCode = function (data, callbacks) {
-  console.log("getAuthCode called with data:", data);
-
-  // Check if data is valid
-  if (!data || !data.clientId || !data.redirectUrl) {
-    console.error("ERROR: Invalid data passed to getAuthCode. Data must include 'clientId' and 'redirectUrl'.", data);
+  console.log("getAuthCode called with data:", data); // Log the incoming data
+  
+  if (!data) {
+    console.error("No data received.");
     if (callbacks && typeof callbacks.fail === 'function') {
-      callbacks.fail("Invalid data passed to getAuthCode.");
+      callbacks.fail("No data received.");
     }
     return;
   }
 
-  // Check if Flutter in-app webview handler exists
-  if (!window.flutter_inappwebview || !window.flutter_inappwebview.callHandler) {
-    console.error("ERROR: flutter_inappwebview.callHandler is not defined.");
+  // Check if the necessary properties exist
+  if (!data.clientId || !data.redirectUrl) {
+    console.error("Invalid data structure:", data);
     if (callbacks && typeof callbacks.fail === 'function') {
-      callbacks.fail("flutter_inappwebview.callHandler is not defined.");
+      callbacks.fail("Invalid data structure.");
     }
     return;
   }
 
-  // Log the beginning of the call to Flutter
-  console.log("Calling Flutter handler 'my.getAuthCode' with data:", data);
+  console.log("Client ID:", data.clientId);
+  console.log("Redirect URL:", data.redirectUrl);
 
   window.flutter_inappwebview.callHandler('my.getAuthCode', data)
     .then(response => {
@@ -88,7 +87,8 @@ getAuthCode = function (data, callbacks) {
         callbacks.fail(error);
       }
     });
-};
+},
+
 
 
   syncAuthCode: function () {
@@ -123,7 +123,6 @@ getAuthCode = function (data, callbacks) {
             }
         });
 },
-
 
 
   getUserConsent: function (data, callbacks) {
