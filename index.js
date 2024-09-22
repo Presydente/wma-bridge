@@ -42,7 +42,6 @@ const my = {
     }
   },
 
-
 getAuthCode = function (data, callbacks) {
   console.log("getAuthCode called with data:", data);
 
@@ -69,6 +68,8 @@ getAuthCode = function (data, callbacks) {
 
   window.flutter_inappwebview.callHandler('my.getAuthCode', data)
     .then(response => {
+      console.log("Response from Flutter callHandler:", response);
+
       if (response === null) {
         console.error("No response received from Flutter.");
         if (callbacks && typeof callbacks.fail === 'function') {
@@ -88,7 +89,6 @@ getAuthCode = function (data, callbacks) {
       }
     });
 };
-
 
 
   syncAuthCode: function () {
