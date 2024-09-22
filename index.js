@@ -43,27 +43,52 @@ const my = {
   },
 
 
-  getAuthCode: function (data, callbacks) {
-    window.flutter_inappwebview.callHandler('my.getAuthCode', data)
-      .then(response => {
-        if (response === null) {
-          console.error("No response received from Flutter.");
-          if (callbacks && typeof callbacks.fail === 'function') {
-            callbacks.fail("No response received from Flutter.");
-          }
-        } else {
-          if (callbacks && typeof callbacks.success === 'function') {
-            callbacks.success(response);
-          }
-        }
-      })
-      .catch(error => {
-        console.error("Error sending Auth Code to Flutter", error);
+getAuthCode = function (data, callbacks) {
+  console.log("getAuthCode called with data:", data);
+
+  // Check if data is valid
+  if (!data || !data.clientId || !data.redirectUrl) {
+    console.error("ERROR: Invalid data passed to getAuthCode. Data must include 'clientId' and 'redirectUrl'.", data);
+    if (callbacks && typeof callbacks.fail === 'function') {
+      callbacks.fail("Invalid data passed to getAuthCode.");
+    }
+    return;
+  }
+
+  // Check if Flutter in-app webview handler exists
+  if (!window.flutter_inappwebview || !window.flutter_inappwebview.callHandler) {
+    console.error("ERROR: flutter_inappwebview.callHandler is not defined.");
+    if (callbacks && typeof callbacks.fail === 'function') {
+      callbacks.fail("flutter_inappwebview.callHandler is not defined.");
+    }
+    return;
+  }
+
+  // Log the beginning of the call to Flutter
+  console.log("Calling Flutter handler 'my.getAuthCode' with data:", data);
+
+  window.flutter_inappwebview.callHandler('my.getAuthCode', data)
+    .then(response => {
+      if (response === null) {
+        console.error("No response received from Flutter.");
         if (callbacks && typeof callbacks.fail === 'function') {
-          callbacks.fail(error);
+          callbacks.fail("No response received from Flutter.");
         }
-      });
-  },
+      } else {
+        console.log("Success response received from Flutter:", response);
+        if (callbacks && typeof callbacks.success === 'function') {
+          callbacks.success(response);
+        }
+      }
+    })
+    .catch(error => {
+      console.error("Error sending Auth Code to Flutter:", error);
+      if (callbacks && typeof callbacks.fail === 'function') {
+        callbacks.fail(error);
+      }
+    });
+};
+
 
 
   syncAuthCode: function () {
