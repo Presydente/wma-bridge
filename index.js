@@ -8,9 +8,9 @@ const my = {
 
   // Initiate method to register multiple callbacks at once
   initiate: function (config) {
-    Object.keys(config).forEach(function (key) {
+    Object.keys(config).forEach(key => {
       this.registerCallback(key, config[key]);
-    }.bind(this));
+    });
   },
 
   // Register a callback for a given key
@@ -50,7 +50,7 @@ const my = {
   // Get Authorization Code from Flutter
   getAuthCode: function (data, callbacks) {
     this.registerCallback(syncAuthCode, callbacks);  // Register callbacks before calling
-    this.callFlutterHandler('my.getAuthCode', data, 'syncAuthCode');
+    this.callFlutterHandler('my.getAuthCode', data, syncAuthCode);
   },
 
   // Synchronize Auth Code
@@ -98,15 +98,15 @@ const my = {
 
   // Setup Event Listeners for different events
   setupEventListeners: function () {
-    document.addEventListener('SyncAuthCode', (e) => {
+    document.addEventListener('SyncAuthCode', e => {
       this.callCallbacks(syncAuthCode, 'success', e.detail);
     });
 
-    document.addEventListener('SyncTradePay', (e) => {
+    document.addEventListener('SyncTradePay', e => {
       this.callCallbacks(syncTradePayData, 'success', e.detail);
     });
 
-    document.addEventListener('SyncUserConsent', (e) => {
+    document.addEventListener('SyncUserConsent', e => {
       this.callCallbacks(syncUserConsentData, 'success', e.detail);
     });
   }
