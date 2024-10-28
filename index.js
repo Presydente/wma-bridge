@@ -173,26 +173,24 @@ const my = {
 
 
   syncTradePay: function () {
-    // Call the 'syncTradePay' handler from Flutter
+    // Call the handler from Flutter to retrieve trade pay data
     window.flutter_inappwebview.callHandler('my.syncTradePay')
       .then(result => {
-        // Check if result is not null
-        if (result !== null) {
+        if (result !== null && result.auxNo) {
           // Process success callbacks if they exist
           if (Array.isArray(this.callbacks['syncTradePayData'])) {
             this.callbacks['syncTradePayData'].forEach(callbackObj => {
               if (callbackObj.success && typeof callbackObj.success === 'function') {
-                // Send result as a JSON string
-                callbackObj.success(JSON.stringify(result));
+                callbackObj.success(JSON.stringify(result)); // Send result as JSON string
               }
             });
           }
         } else {
-          // Handle case where no result data was received
+          // Handle case where no result data was received or auxNo is missing
           if (Array.isArray(this.callbacks['syncTradePayData'])) {
             this.callbacks['syncTradePayData'].forEach(callbackObj => {
               if (callbackObj.fail && typeof callbackObj.fail === 'function') {
-                callbackObj.fail(new Error("No trade pay data received."));
+                callbackObj.fail(new Error("No valid trade pay data received."));
               }
             });
           }
