@@ -212,9 +212,8 @@ const my = {
     });
 
     document.addEventListener('SyncTradePay', (e) => {
-  this.callCallbacks('syncTradePayData', 'success', e.detail);
-});
-
+      this.callCallbacks('syncTradePayData', 'success', e.detail);
+    });
 
     document.addEventListener('SyncUserConsent', (e) => {
       this.callCallback('userConsentEvent', e.detail);
@@ -226,4 +225,3 @@ const my = {
 my.setupEventListeners();
 
 window.my = my;
-
