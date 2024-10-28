@@ -100,53 +100,53 @@ const my = {
 },
 
 
+  // Commented out for now as it is not being used
+  // getUserConsent: function (data, callbacks) {
+  //   window.flutter_inappwebview.callHandler('my.getUserConsent', data)
+  //     .then(response => {
+  //       if (response === null) {
+  //         console.error("No consent response received from Flutter.");
+  //         if (callbacks && typeof callbacks.fail === 'function') {
+  //           callbacks.fail("No consent response received from Flutter.");
+  //         }
+  //       } else {
+  //         if (callbacks && typeof callbacks.success === 'function') {
+  //           callbacks.success(response);
+  //         }
+  //       }
+  //     })
+  //     .catch(error => {
+  //       console.error("Error sending consent to Flutter", error);
+  //       if (callbacks && typeof callbacks.fail === 'function') {
+  //         callbacks.fail(error);
+  //       }
+  //     });
+  // },
 
-  getUserConsent: function (data, callbacks) {
-    window.flutter_inappwebview.callHandler('my.getUserConsent', data)
-      .then(response => {
-        if (response === null) {
-          console.error("No consent response received from Flutter.");
-          if (callbacks && typeof callbacks.fail === 'function') {
-            callbacks.fail("No consent response received from Flutter.");
-          }
-        } else {
-          if (callbacks && typeof callbacks.success === 'function') {
-            callbacks.success(response);
-          }
-        }
-      })
-      .catch(error => {
-        console.error("Error sending consent to Flutter", error);
-        if (callbacks && typeof callbacks.fail === 'function') {
-          callbacks.fail(error);
-        }
-      });
-  },
 
-
-  syncUserConsent: function () {
-    window.flutter_inappwebview.callHandler('my.syncUserConsent')
-      .then(result => {
-        if (this.callbacks['syncUserConsentData'] && this.callbacks['syncUserConsentData'].length > 0) {
-          this.callbacks['syncUserConsentData'].forEach(callbackObj => {
-            if (result !== null && callbackObj.success && typeof callbackObj.success === 'function') {
-              callbackObj.success(JSON.stringify(result));
-            } else if (!result && callbackObj.fail && typeof callbackObj.fail === 'function') {
-              callbackObj.fail(new Error("No user consent data received."));
-            }
-          });
-        }
-      })
-      .catch(error => {
-        if (this.callbacks['syncUserConsentData'] && this.callbacks['syncUserConsentData'].length > 0) {
-          this.callbacks['syncUserConsentData'].forEach(callbackObj => {
-            if (callbackObj.fail && typeof callbackObj.fail === 'function') {
-              callbackObj.fail(error);
-            }
-          });
-        }
-      });
-  },
+  // syncUserConsent: function () {
+  //   window.flutter_inappwebview.callHandler('my.syncUserConsent')
+  //     .then(result => {
+  //       if (this.callbacks['syncUserConsentData'] && this.callbacks['syncUserConsentData'].length > 0) {
+  //         this.callbacks['syncUserConsentData'].forEach(callbackObj => {
+  //           if (result !== null && callbackObj.success && typeof callbackObj.success === 'function') {
+  //             callbackObj.success(JSON.stringify(result));
+  //           } else if (!result && callbackObj.fail && typeof callbackObj.fail === 'function') {
+  //             callbackObj.fail(new Error("No user consent data received."));
+  //           }
+  //         });
+  //       }
+  //     })
+  //     .catch(error => {
+  //       if (this.callbacks['syncUserConsentData'] && this.callbacks['syncUserConsentData'].length > 0) {
+  //         this.callbacks['syncUserConsentData'].forEach(callbackObj => {
+  //           if (callbackObj.fail && typeof callbackObj.fail === 'function') {
+  //             callbackObj.fail(error);
+  //           }
+  //         });
+  //       }
+  //     });
+  // },
 
 
   getTradePay: function (data, callbacks) {
@@ -212,8 +212,8 @@ const my = {
     });
 
     document.addEventListener('SyncTradePay', (e) => {
-      this.callCallback('syncTradePayEvent', e.detail);
-    });
+  this.callCallbacks('syncTradePayData', 'success', e.detail);
+});
 
     document.addEventListener('SyncUserConsent', (e) => {
       this.callCallback('userConsentEvent', e.detail);
