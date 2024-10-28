@@ -172,39 +172,47 @@ const my = {
   },
 
 
-  syncTradePay: function () {
-    window.flutter_inappwebview.callHandler('my.syncTradePay')
-      .then(result => {
-        if (result !== null) {
-          if (Array.isArray(this.callbacks['syncTradePayData'])) {
-            this.callbacks['syncTradePayData'].forEach(callbackObj => {
-              if (callbackObj.success && typeof callbackObj.success === 'function') {
-                callbackObj.success(JSON.stringify(result));
-              }
-            });
-          }
-        } else {
-          if (Array.isArray(this.callbacks['syncTradePayData'])) {
-            this.callbacks['syncTradePayData'].forEach(callbackObj => {
-              if (callbackObj.fail && typeof callbackObj.fail === 'function') {
-                callbackObj.fail(new Error("No trade pay data received."));
-              }
-            });
-          }
-        }
-      })
-      .catch(error => {
-        console.error("Error syncing trade pay data", error);
+ syncTradePay: function () {
+  window.flutter_inappwebview.callHandler('my.syncTradePay')
+    .then(result => {
+      if (result !== null) {
+        // Convert the result to a JSON string and send it in the event
+        const event = new CustomEvent('SyncTradePay', {
+          detail: { data: JSON.stringify(result) }
+        });
+        document.dispatchEvent(event);
+
+        // Invoke the success callback for any registered listeners
         if (Array.isArray(this.callbacks['syncTradePayData'])) {
           this.callbacks['syncTradePayData'].forEach(callbackObj => {
-            if (callbackObj.fail && typeof callbackObj.fail === 'function') {
-              callbackObj.fail(error);
+            if (callbackObj.success && typeof callbackObj.success === 'function') {
+              callbackObj.success(JSON.stringify(result));
             }
           });
         }
-      });
-  },
-
+      } else {
+        // Handle the no-data case
+        if (Array.isArray(this.callbacks['syncTradePayData'])) {
+          this.callbacks['syncTradePayData'].forEach(callbackObj => {
+            if (callbackObj.fail && typeof callbackObj.fail === 'function') {
+              callbackObj.fail(new Error("No trade pay data received."));
+            }
+          });
+        }
+      }
+    })
+    .catch(error => {
+      console.error("Error syncing trade pay data", error);
+      // Handle any errors
+      if (Array.isArray(this.callbacks['syncTradePayData'])) {
+        this.callbacks['syncTradePayData'].forEach(callbackObj => {
+          if (callbackObj.fail && typeof callbackObj.fail === 'function') {
+            callbackObj.fail(error);
+          }
+        });
+      }
+    });
+},
 
   setupEventListeners: function () {
     document.addEventListener('SyncAuthCode', (e) => {
