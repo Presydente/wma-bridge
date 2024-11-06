@@ -86,11 +86,13 @@ window.my = my;
 
 // Initialize the callbacks for syncTradePayData
 my.initiate({
-  syncAuthCode: {
-    success(data) {
+ syncAuthCode: {
+    success: function(data) {
+      console.log("Successfully received auth code:", data);
       window.dispatchEvent(new CustomEvent('syncAuthCodeSuccess', { detail: data }));
     },
-    fail(error) {
+    fail: function(error) {
+      console.error("Failed to sync auth code:", error);
       window.dispatchEvent(new CustomEvent('syncAuthCodeFail', { detail: error }));
     }
   },
