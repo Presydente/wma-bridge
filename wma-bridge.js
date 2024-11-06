@@ -94,12 +94,18 @@ my.initiate({
       window.dispatchEvent(new CustomEvent('syncAuthCodeFail', { detail: error }));
     }
   },
-  syncTradePayData: {
-    success(data) {
-      window.dispatchEvent(new CustomEvent('syncTradePayDataSuccess', { detail: data }));
-    },
-    fail(error) {
-      window.dispatchEvent(new CustomEvent('syncTradePayDataFail', { detail: error }));
+syncTradePayData: {
+  success(data) {
+    if (data && data.auxNo) {
+      window.dispatchEvent(new CustomEvent('syncTradePayDataSuccess', { detail: { auxNo: data.auxNo } }));
+    } else {
+      window.dispatchEvent(new CustomEvent('syncTradePayDataFail', { detail: 'No auxNo found' }));
     }
+  },
+  fail(error) {
+    console.error("Failed to sync trade pay data:", error);
+    window.dispatchEvent(new CustomEvent('syncTradePayDataFail', { detail: error }));
   }
+}
+
 });
