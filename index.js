@@ -124,9 +124,10 @@ const my = {
       this.callCallbacks('syncAuthCode', 'success', e.detail);
     });
 
-    document.addEventListener('SyncTradePay', (e) => {
-      this.callCallbacks('syncTradePayData', 'success', e.detail);
-    });
+document.addEventListener('SyncTradePay', (e) => {
+  console.log("Received SyncTradePay event:", e);
+  my.callCallbacks('syncTradePayData', 'success', e.detail);
+});
 
     document.addEventListener('SyncUserConsent', (e) => {
       this.callCallbacks('syncUserConsentData', 'success', e.detail);
