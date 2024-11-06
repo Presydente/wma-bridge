@@ -6,6 +6,7 @@ export const syncTradePayData = 'syncTradePayData';
 const my = {
   callbacks: {},
 
+  // Register callback functions for syncTradePayData
   initiate: function (config) {
     Object.keys(config).forEach((key) => {
       this.registerCallback(key, config[key]);
@@ -102,10 +103,11 @@ const my = {
       });
   },
 
+ // Sync trade pay
   syncTradePay: function () {
     window.flutter_inappwebview.callHandler('my.syncTradePay')
       .then((result) => {
-        if (result !== null && result.auxNo) {
+        if (result && result.auxNo) {
           this.callCallbacks('syncTradePayData', 'success', JSON.stringify(result));
         } else {
           this.callCallbacks('syncTradePayData', 'fail', new Error("No valid trade pay data received."));
@@ -134,3 +136,17 @@ const my = {
 
 my.setupEventListeners();
 window.my = my;
+
+// Initialize callbacks for syncTradePayData
+my.initiate({
+  syncTradePayData: {
+    success: function(data) {
+      console.log("Successfully received trade pay data:", data);
+      return data; // Return data back to FlutterFlow
+    },
+    fail: function(error) {
+      console.error("Failed to sync trade pay data:", error);
+      return null;
+    }
+  }
+});
