@@ -96,9 +96,13 @@ my.initiate({
   },
 syncTradePayData: {
   success(data) {
+    console.log("syncTradePayData success callback triggered with data:", data);
     if (data && data.auxNo) {
-      window.dispatchEvent(new CustomEvent('syncTradePayDataSuccess', { detail: { auxNo: data.auxNo } }));
+      const eventDetail = { auxNo: data.auxNo };
+      console.log("Dispatching syncTradePayDataSuccess event with detail:", eventDetail);
+      window.dispatchEvent(new CustomEvent('syncTradePayDataSuccess', { detail: eventDetail }));
     } else {
+      console.warn("No auxNo found in data:", data);
       window.dispatchEvent(new CustomEvent('syncTradePayDataFail', { detail: 'No auxNo found' }));
     }
   },
@@ -107,5 +111,4 @@ syncTradePayData: {
     window.dispatchEvent(new CustomEvent('syncTradePayDataFail', { detail: error }));
   }
 }
-
 });
