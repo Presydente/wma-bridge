@@ -42,6 +42,7 @@ const my = {
     }
   },
 
+  
   getAuthCode: function (data, callbacks) {
     window.flutter_inappwebview.callHandler('my.getAuthCode', data)
       .then((response) => {
