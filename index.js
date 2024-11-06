@@ -142,11 +142,13 @@ my.initiate({
   syncTradePayData: {
     success: function(data) {
       console.log("Successfully received trade pay data:", data);
-      return data; // Return data back to FlutterFlow
+      // Dispatch custom event with the trade pay data
+      window.dispatchEvent(new CustomEvent('syncTradePayDataSuccess', { detail: data }));
     },
     fail: function(error) {
       console.error("Failed to sync trade pay data:", error);
-      return null;
+      // Dispatch custom event with error
+      window.dispatchEvent(new CustomEvent('syncTradePayDataFail', { detail: error }));
     }
   }
 });
