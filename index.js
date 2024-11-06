@@ -140,15 +140,23 @@ window.my = my;
 
 // Initialize callbacks for syncTradePayData
 my.initiate({
+  syncAuthCode: {
+    success: function(data) {
+      console.log("Successfully received auth code:", data);
+      window.dispatchEvent(new CustomEvent('syncAuthCodeSuccess', { detail: data }));
+    },
+    fail: function(error) {
+      console.error("Failed to sync auth code:", error);
+      window.dispatchEvent(new CustomEvent('syncAuthCodeFail', { detail: error }));
+    }
+  },
   syncTradePayData: {
     success: function(data) {
       console.log("Successfully received trade pay data:", data);
-      // Dispatch custom event with the trade pay data
       window.dispatchEvent(new CustomEvent('syncTradePayDataSuccess', { detail: data }));
     },
     fail: function(error) {
       console.error("Failed to sync trade pay data:", error);
-      // Dispatch custom event with error
       window.dispatchEvent(new CustomEvent('syncTradePayDataFail', { detail: error }));
     }
   }
