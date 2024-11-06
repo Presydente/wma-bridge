@@ -3,19 +3,21 @@ export const syncAuthCode = 'syncAuthCode';
 export const syncUserConsentData = 'syncUserConsentData';
 export const syncTradePayData = 'syncTradePayData';
 
-
 const my = {
   callbacks: {},
 
+  // Register callback functions for syncTradePayData
   initiate: function (config) {
-    Object.keys(config).forEach(function (key) {
+    Object.keys(config).forEach((key) => {
       this.registerCallback(key, config[key]);
-    }.bind(this));
+    });
   },
 
   registerCallback: function (key, callback) {
-    if (callback.success && typeof callback.success === 'function' &&
-      callback.fail && typeof callback.fail === 'function') {
+    if (
+      callback.success && typeof callback.success === 'function' &&
+      callback.fail && typeof callback.fail === 'function'
+    ) {
       if (!this.callbacks[key]) {
         this.callbacks[key] = [];
       }
@@ -25,10 +27,9 @@ const my = {
     }
   },
 
-
   callCallbacks: function (key, type, data) {
     if (this.callbacks[key] && Array.isArray(this.callbacks[key])) {
-      this.callbacks[key].forEach(callbackObj => {
+      this.callbacks[key].forEach((callbackObj) => {
         if (callbackObj[type] && typeof callbackObj[type] === 'function') {
           try {
             callbackObj[type](data);
@@ -42,10 +43,10 @@ const my = {
     }
   },
 
-
+  
   getAuthCode: function (data, callbacks) {
     window.flutter_inappwebview.callHandler('my.getAuthCode', data)
-      .then(response => {
+      .then((response) => {
         if (response === null) {
           console.error("No response received from Flutter.");
           if (callbacks && typeof callbacks.fail === 'function') {
@@ -57,7 +58,7 @@ const my = {
           }
         }
       })
-      .catch(error => {
+      .catch((error) => {
         console.error("Error sending Auth Code to Flutter", error);
         if (callbacks && typeof callbacks.fail === 'function') {
           callbacks.fail(error);
@@ -65,105 +66,36 @@ const my = {
       });
   },
 
-
   syncAuthCode: function () {
     window.flutter_inappwebview.callHandler('my.syncAuthCode')
-        .then(result => {
-            if (result && result.code) {
-                if (Array.isArray(this.callbacks['syncAuthCode'])) {
-                    this.callbacks['syncAuthCode'].forEach(callbackObj => {
-                        if (callbackObj.success && typeof callbackObj.success === 'function') {
-                            callbackObj.success(result.code);
-                        }
-                    });
-                }
-            } else {
-                if (Array.isArray(this.callbacks['syncAuthCode'])) {
-                    this.callbacks['syncAuthCode'].forEach(callbackObj => {
-                        if (callbackObj.fail && typeof callbackObj.fail === 'function') {
-                            callbackObj.fail(new Error("No code received from Flutter."));
-                        }
-                    });
-                }
-            }
-        })
-        .catch(error => {
-            console.error("Error syncing auth code", error);
-            if (Array.isArray(this.callbacks['syncAuthCode'])) {
-                this.callbacks['syncAuthCode'].forEach(callbackObj => {
-                    if (callbackObj.fail && typeof callbackObj.fail === 'function') {
-                        callbackObj.fail(error);
-                    }
-                });
-            }
-        });
-},
-
-
-
-  getUserConsent: function (data, callbacks) {
-    window.flutter_inappwebview.callHandler('my.getUserConsent', data)
-      .then(response => {
-        if (response === null) {
-          console.error("No consent response received from Flutter.");
-          if (callbacks && typeof callbacks.fail === 'function') {
-            callbacks.fail("No consent response received from Flutter.");
-          }
+      .then((result) => {
+        if (result && result.code) {
+          this.callCallbacks('syncAuthCode', 'success', result.code);
         } else {
-          if (callbacks && typeof callbacks.success === 'function') {
-            callbacks.success(response);
-          }
+          this.callCallbacks('syncAuthCode', 'fail', new Error("No code received from Flutter."));
         }
       })
-      .catch(error => {
-        console.error("Error sending consent to Flutter", error);
-        if (callbacks && typeof callbacks.fail === 'function') {
-          callbacks.fail(error);
-        }
+      .catch((error) => {
+        console.error("Error syncing auth code", error);
+        this.callCallbacks('syncAuthCode', 'fail', error);
       });
   },
-
-
-  syncUserConsent: function () {
-    window.flutter_inappwebview.callHandler('my.syncUserConsent')
-      .then(result => {
-        if (this.callbacks['syncUserConsentData'] && this.callbacks['syncUserConsentData'].length > 0) {
-          this.callbacks['syncUserConsentData'].forEach(callbackObj => {
-            if (result !== null && callbackObj.success && typeof callbackObj.success === 'function') {
-              callbackObj.success(JSON.stringify(result));
-            } else if (!result && callbackObj.fail && typeof callbackObj.fail === 'function') {
-              callbackObj.fail(new Error("No user consent data received."));
-            }
-          });
-        }
-      })
-      .catch(error => {
-        if (this.callbacks['syncUserConsentData'] && this.callbacks['syncUserConsentData'].length > 0) {
-          this.callbacks['syncUserConsentData'].forEach(callbackObj => {
-            if (callbackObj.fail && typeof callbackObj.fail === 'function') {
-              callbackObj.fail(error);
-            }
-          });
-        }
-      });
-  },
-
 
   getTradePay: function (data, callbacks) {
     window.flutter_inappwebview.callHandler('my.getTradePay', data)
-      .then(result => {
+      .then((result) => {
         if (result === null) {
           console.error("No trade payment response received.");
           if (callbacks && typeof callbacks.fail === 'function') {
             callbacks.fail("No trade payment response received.");
           }
-        } else {  
+        } else {
           if (callbacks && typeof callbacks.success === 'function') {
             callbacks.success(result);
           }
         }
       })
-      .catch(error => {
+      .catch((error) => {
         console.error("Error processing trade payment", error);
         if (callbacks && typeof callbacks.fail === 'function') {
           callbacks.fail(error);
@@ -171,60 +103,61 @@ const my = {
       });
   },
 
-
+ // Sync trade pay
   syncTradePay: function () {
     window.flutter_inappwebview.callHandler('my.syncTradePay')
-      .then(result => {
-        if (result !== null) {
-          if (Array.isArray(this.callbacks['syncTradePayData'])) {
-            this.callbacks['syncTradePayData'].forEach(callbackObj => {
-              if (callbackObj.success && typeof callbackObj.success === 'function') {
-                callbackObj.success(JSON.stringify(result));
-              }
-            });
-          }
+      .then((result) => {
+        if (result && result.auxNo) {
+          this.callCallbacks('syncTradePayData', 'success', JSON.stringify(result));
         } else {
-          if (Array.isArray(this.callbacks['syncTradePayData'])) {
-            this.callbacks['syncTradePayData'].forEach(callbackObj => {
-              if (callbackObj.fail && typeof callbackObj.fail === 'function') {
-                callbackObj.fail(new Error("No trade pay data received."));
-              }
-            });
-          }
+          this.callCallbacks('syncTradePayData', 'fail', new Error("No valid trade pay data received."));
         }
       })
-      .catch(error => {
+      .catch((error) => {
         console.error("Error syncing trade pay data", error);
-        if (Array.isArray(this.callbacks['syncTradePayData'])) {
-          this.callbacks['syncTradePayData'].forEach(callbackObj => {
-            if (callbackObj.fail && typeof callbackObj.fail === 'function') {
-              callbackObj.fail(error);
-            }
-          });
-        }
+        this.callCallbacks('syncTradePayData', 'fail', error);
       });
   },
 
-
   setupEventListeners: function () {
     document.addEventListener('SyncAuthCode', (e) => {
-      this.callCallback('syncAuthCodeEvent', e.detail);
+      this.callCallbacks('syncAuthCode', 'success', e.detail);
     });
 
-    document.addEventListener('SyncTradePay', (e) => {
-      this.callCallback('syncTradePayEvent', e.detail);
-    });
+document.addEventListener('SyncTradePay', (e) => {
+  console.log("Received SyncTradePay event:", e);
+  my.callCallbacks('syncTradePayData', 'success', e.detail);
+});
 
     document.addEventListener('SyncUserConsent', (e) => {
-      this.callCallback('userConsentEvent', e.detail);
+      this.callCallbacks('syncUserConsentData', 'success', e.detail);
     });
   }
 };
 
-
 my.setupEventListeners();
-
 window.my = my;
 
-
-export { my };
+// Initialize callbacks for syncTradePayData
+my.initiate({
+  syncAuthCode: {
+    success: function(data) {
+      console.log("Successfully received auth code:", data);
+      window.dispatchEvent(new CustomEvent('syncAuthCodeSuccess', { detail: data }));
+    },
+    fail: function(error) {
+      console.error("Failed to sync auth code:", error);
+      window.dispatchEvent(new CustomEvent('syncAuthCodeFail', { detail: error }));
+    }
+  },
+  syncTradePayData: {
+    success: function(data) {
+      console.log("Successfully received trade pay data:", data);
+      window.dispatchEvent(new CustomEvent('syncTradePayDataSuccess', { detail: data }));
+    },
+    fail: function(error) {
+      console.error("Failed to sync trade pay data:", error);
+      window.dispatchEvent(new CustomEvent('syncTradePayDataFail', { detail: error }));
+    }
+  }
+});
