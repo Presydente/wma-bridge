@@ -61,17 +61,17 @@ const my = {
     this.handleAsyncCall('my.getTradePay', syncTradePayData, data);
   },
 
-  syncTradePay() {
-    this.handleAsyncCall('my.syncTradePay', syncTradePayData);
+ // Sync trade pay
+  syncTradePayListener() {
+    document.addEventListener('SyncTradePay', (e) => {
+      console.log("Received SyncTradePay event:", e.detail);
+      my.callCallbacks(syncTradePayData, 'success', e.detail);
+    });
   },
 
   setupEventListeners() {
     document.addEventListener('SyncAuthCode', (e) => {
       this.callCallbacks(syncAuthCode, 'success', e.detail);
-    });
-
-    document.addEventListener('SyncTradePay', (e) => {
-      this.callCallbacks(syncTradePayData, 'success', e.detail);
     });
 
     document.addEventListener('SyncUserConsent', (e) => {
@@ -97,20 +97,21 @@ my.initiate({
     }
   },
 syncTradePayData: {
-  success(data) {
-    console.log("syncTradePayData success callback triggered with data:", data);
-    if (data && data.auxNo) {
-      const eventDetail = { auxNo: data.auxNo };
-      console.log("Dispatching syncTradePayDataSuccess event with detail:", eventDetail);
-      window.dispatchEvent(new CustomEvent('syncTradePayDataSuccess', { detail: eventDetail }));
-    } else {
-      console.warn("No auxNo found in data:", data);
-      window.dispatchEvent(new CustomEvent('syncTradePayDataFail', { detail: 'No auxNo found' }));
+    success(data) {
+      if (data && data.auxNo) {
+        window.dispatchEvent(new CustomEvent('syncTradePayDataSuccess', { detail: { auxNo: data.auxNo } }));
+      } else {
+        window.dispatchEvent(new CustomEvent('syncTradePayDataFail', { detail: 'No auxNo found' }));
+      }
+    },
+    fail(error) {
+      console.error("Failed to sync trade pay data:", error);
+      window.dispatchEvent(new CustomEvent('syncTradePayDataFail', { detail: error }));
     }
-  },
-  fail(error) {
-    console.error("Failed to sync trade pay data:", error);
-    window.dispatchEvent(new CustomEvent('syncTradePayDataFail', { detail: error }));
   }
-}
 });
+
+// Add listener when Super App payment completes
+function startSyncTradePay() {
+  my.syncTradePayListener();
+}
